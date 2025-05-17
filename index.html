@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Geografia 9ºO</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Geografia de 9ºano</h1>
+    <div id="quiz"></div>
+    <button id="next-btn">Próxima</button>
+  </div>
+
+  <script>
+    let acertos = 0;
+    let erros = 0;
+
+    const quizData = [
+      {
+        pergunta: "Qual das ações a baixo não são causadoras do aquecimento global?",
+        opcoes: ["A)Desmatamentos", "B)Erosões", "c) queimadas", "D)poluicoes", "E)combustoes"],
+        correta: 1
+      },
+      {
+        pergunta: "Qual dos gases, dentre os citados abaixo, NÃO é causador do efeito estufa?",
+        opcoes: ["a) Gás metano.", "b) Dióxido de carbono.", "c) Gás carbônico.", "d) Hexafluoreto de enxofre.", "e) Óxido nitroso"],
+        correta: 2
+      },
+      {
+        pergunta: "Qual das medidas abaixo é fundamental para combater o aquecimento global?",
+        opcoes: ["a) A desvalorização das práticas tradicionais dos indígenas.", "b) A utilização de combustíveis fósseis para geração solar.", "c) A extinção de reservas de preservação do meio ambiente.", "d) A diminuição do lançamento de poluentes atmosféricos.", "e) A elevação do volume de rejeitos emitidos pelas fábricas."],
+        correta: 3
+      },
+      {
+        pergunta: "Um dos efeitos danosos do aquecimento global que é verificado em zonas oceânicas é:",
+        opcoes: ["a) O crescimento dos recifes de corais.", "b) O aumento do nível dos oceanos.", "c) O lançamento de poluentes fabris.", "d) O crescimento da biodiversidade.","e) O aumento das precipitações ácidas"],
+        correta: 1
+      },
+      {
+        pergunta: "Qual medida pode ser adotada em portugal para atenuar os efeitos do aquecimento global?",
+        opcoes: ["a) A reciclagem de materiais.", "b) A contenção do desmatamento.", "c) A diminuição da industrialização.", "d) A promoção do turismo."],
+        correta: 0
+      },
+      {
+        pergunta: "O aquecimento global tem sido um problema enfrentado por todas as nações. O uso de fontes de energia não renováveis é o responsável por esse aquecimento. Assinale qual é a fonte de energia mais recomendável para que haja uma diminuição dos gases causadores do aquecimento global.",
+        opcoes: ["a) Óleo diesel.", "b) Gasolina.", "c) Vento.", "d) Gás natural.", "e) Petróleo."],
+        correta: 2
+      },
+      {
+        pergunta: " A mudança climática. Aquecimento Global refere-se ao aumento da temperatura média global que por sus vez faz com que a mudança climática ocorra",
+        opcoes: ["a) Verdadeiro", "b) Falso"],
+        correta: 0
+      },
+      {
+        pergunta: "Qual é o principal gás responsável pelo efeito de estufa intensificado?",
+        opcoes: ["a) Oxigénio", "b) Dióxido de carbono ", "c) Azoto", "d) Ozono"],
+        correta: 1
+      },
+      {
+        pergunta: "Qual destas atividades humanas contribui mais para o aquecimento global?",
+        opcoes: ["a) Reciclagem de papel", "b) Condução de veículos elétricos", "c) Queima de combustíveis fósseis", "d) Reflorestação"],
+        correta: 2
+      },
+      {
+        pergunta: "Qual das seguintes consequências é associada ao aquecimento global?",
+        opcoes: ["a) Redução do nível do mar", "b) Aumento da biodiversidade", "c) Derretimento das calotes polares", "d) Formação de desertos gelados"],
+        correta: 2
+      },
+      {
+        pergunta: "Como podemos reduzir a emissão de gases com efeito de estufa?",
+        opcoes: ["a) Usar mais carros a gasolina", "b) Aumentar o uso de energias renováveis", "c) Deforestar áreas para agricultura", "d) Queimar mais carvão"],
+        correta: 1
+      },
+      {
+        pergunta: " O que é o Protocolo de Quioto?",
+        opcoes: ["a) Um tratado de comércio internacional", "b) Um documento de direitos humanos", "c) Um acordo global para reduzir as emissões de gases com efeito de estufa", "d) Uma conferência sobre biodiversidade"],
+        correta: 2
+      },
+      {
+        pergunta: "Qual destas energias é mais amiga do ambiente?",
+        opcoes: ["a) Carvão", "b) Gás natural", "c) Energia solar", "d) Petróleo"],
+        correta: 2
+      },
+      {
+        pergunta: "O que acontece aos oceanos com o aquecimento global?",
+        opcoes: ["a) Arrefecem", "b) Ficam menos poluídos", "c) Absorvem mais CO₂ e aumentam de temperatura", "d) Secam"],
+        correta: 2
+      },
+      {
+        pergunta: "Qual a relação entre o aquecimento global e os fenómenos extremos?",
+        opcoes: ["a) Não existe relação", "b) Reduzem-se os fenómenos extremos", "c) Aumentam a frequência e intensidade dos fenómenos extremos", "d) Apenas causam cheias"],
+        correta: 2
+      }
+
+    ];
+   //ja estou sem ideias assinado jaime 
+    const quiz = document.getElementById("quiz");
+    const nextBtn = document.getElementById("next-btn");
+
+    let index = 0;
+    let podeClicar = true;
+
+    function carregarPergunta() {
+      podeClicar = true;
+      const q = quizData[index];
+      quiz.innerHTML = `
+        <h2>${q.pergunta}</h2>
+        <div class="opcoes">
+          ${q.opcoes.map((opcao, i) => `
+            <button class="opcao" onclick="responder(${i})">${opcao}</button>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function responder(escolhida) {
+      if (!podeClicar) return;
+      podeClicar = false;
+
+      if (escolhida === quizData[index].correta) {
+        acertos++;
+      } else {
+        erros++;
+      }
+
+      const botoes = document.querySelectorAll(".opcao");
+      botoes.forEach((btn, i) => {
+        if (i === quizData[index].correta) {
+          btn.classList.add("correta");
+        } else if (i === escolhida) {
+          btn.classList.add("errada");
+        }
+        btn.disabled = true;
+      });
+    }
+
+    nextBtn.addEventListener("click", () => {
+      index++;
+      if (index < quizData.length) {
+        carregarPergunta();
+      } else {
+        quiz.innerHTML = `
+          <h2>Fim do quiz!</h2>
+          <p>Acertos: ${acertos}</p>
+          <p>Erros: ${erros}</p>
+          <p>Feito por Jaime Comprido e Felipe Violante 9º0</p>
+        `;
+        nextBtn.style.display = "none";
+      }
+    });
+
+    carregarPergunta();
+  </script>
+</body>
+</html>

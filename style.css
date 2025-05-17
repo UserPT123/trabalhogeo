@@ -1,0 +1,141 @@
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #6e6e6e;
+  margin: 0;
+  padding: 0;
+}
+
+.quiz-container {
+  max-width: 600px;
+  margin: 50px auto;
+  background: rgb(105, 105, 105);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 30px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+h2 {
+  color: #ffffff;
+}
+
+.opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.opcao {
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: #888888;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.opcao:hover {
+  background-color: #ffffff;
+}
+
+.opcao.correta {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.opcao.errada {
+  background-color: #f44336;
+  color: white;
+}
+
+#next-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+#next-btn:hover {
+  background-color: #1976D2;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  background-image: url('fundo.jpg'); 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-family: Arial, sans-serif;
+  color: white;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+
+  background: url('fundo.jpg') no-repeat center center fixed;
+  background-size: cover;
+
+  position: relative;
+  font-family: Arial, sans-serif;
+  color: white;
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+body::before {
+  content: "";
+  position: fixed; 
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  background: linear-gradient(-45deg, rgba(106,17,203,0.5), rgba(37,117,252,0.5), rgba(255,106,0,0.5), rgba(238,119,82,0.5));
+  background-size: 400% 400%;
+
+  animation: gradientAnimation 15s ease infinite;
+
+  z-index: 0;
+  pointer-events: none; 
+}
+
+.quiz-container {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
