@@ -1,0 +1,128 @@
+
+
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <title>Salva o Planeta </title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #e0f7fa;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    canvas {
+      background: #b3e5fc;
+      display: block;
+      margin: 30px auto;
+      border: 2px solid #00796b;
+      border-radius: 10px;
+    }
+    h1 {
+      margin-top: 20px;
+      color: #00796b;
+    }
+    p {
+      color: #004d40;
+    }
+  </style>
+</head>
+<body>
+
+<h1> Salva o Planeta!</h1>
+
+<p> <h1> <a href="index.html" title="Page 2" > Menu </a> </h1>  </p>
+
+<p>Move a planta com as setas e apanha itens bons! Evita os maus! </p>
+
+<canvas id="gameCanvas" width="400" height="500"></canvas>
+
+<script>
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+
+  const player = {
+    x: 180,
+    y: 450,
+    size: 30,
+    speed: 20
+  };
+
+  const items = [];
+  let score = 0;
+
+  const goodItems = ["🌳", "🌞", "🚲"];
+  const badItems = ["🚗", "🏭", "🗑️"];
+
+  function drawPlayer() {
+    ctx.font = "28px Arial";
+    ctx.fillText("🌱", player.x, player.y);
+  }
+
+  function drawItems() {
+    items.forEach(item => {
+      ctx.font = "24px Arial";
+      ctx.fillText(item.emoji, item.x, item.y);
+    });
+  }
+
+  function updateItems() {
+    for (let i = items.length - 1; i >= 0; i--) {
+      items[i].y += 3;
+
+      // colisão
+      if (
+        items[i].y > player.y - 30 &&
+        items[i].x > player.x - 10 &&
+        items[i].x < player.x + player.size
+      ) {
+        if (goodItems.includes(items[i].emoji)) {
+          score += 10;
+        } else {
+          score -= 10;
+        }
+        items.splice(i, 1);
+      } else if (items[i].y > canvas.height) {
+        items.splice(i, 1);
+      }
+    }
+  }
+
+  function gameLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawPlayer();
+    drawItems();
+    updateItems();
+
+    ctx.fillStyle = "#004d40";
+    ctx.font = "18px Arial";
+    ctx.fillText("Pontuação: " + score, 10, 20);
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  function spawnItem() {
+    const isGood = Math.random() < 0.6;
+    const emoji = isGood
+      ? goodItems[Math.floor(Math.random() * goodItems.length)]
+      : badItems[Math.floor(Math.random() * badItems.length)];
+
+    items.push({
+      x: Math.random() * (canvas.width - 30),
+      y: 0,
+      emoji: emoji
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft" && player.x > 0) player.x -= player.speed;
+    if (e.key === "ArrowRight" && player.x < canvas.width - player.size) player.x += player.speed;
+  });
+
+  setInterval(spawnItem, 800);
+  gameLoop();
+</script>
+
+</body>
+</html>
