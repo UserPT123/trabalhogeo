@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8" />
+  <title>Geografia 9ºO dino</title>
+  <body>     <p> <h1> <a href="index.html" title="Menu" > Menu </a> </h1>  </p> </body>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background-color: #a7ffeb;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background-color: #81d4fa;
+      image-rendering: pixelated;
+    }
+    #gameOverScreen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 32px;
+      z-index: 10;
+    }
+    #retryBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 22px;
+      background-color: #00e676;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="1400" height="700"></canvas>
+
+  <div id="gameOverScreen">
+    <div id="finalScore">Pontuação: 0</div>
+    <button id="retryBtn">Tentar outra vez</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const gameOverScreen = document.getElementById("gameOverScreen");
+    const finalScoreText = document.getElementById("finalScore");
+    const retryBtn = document.getElementById("retryBtn");
+
+    const emojiSize = 48;
+    ctx.font = emojiSize + "px Arial";
+
+    let player, obstacles, clouds, items, frame, score, gameOver, powerUpTimer;
+
+    function resetGame() {
+      player = {
+        x: 80,
+        y: canvas.height - 110,
+        width: 50,
+        height: 50,
+        color: "#2196f3", 
+        dy: 0,
+        gravity: 1,
+        jumpForce: -20,
+        grounded: false,
+        jumpBoost: 1
+      };
+
+      obstacles = [];
+      clouds = [
+        { x: 500, y: 100, speed: 0.6 },
+        { x: 1000, y: 160, speed: 0.4 }
+      ];
+      items = [];
+      frame = 0;
+      score = 0;
+      powerUpTimer = 0;
+      gameOver = false;
+      gameOverScreen.style.display = "none";
+      update();
+    }
+
+    function createObstacle() {
+      const emojis = ["🚗", "🗑️"];
+      const chosen = emojis[Math.floor(Math.random() * emojis.length)];
+      obstacles.push({
+        type: "bad",
+        emoji: chosen,
+        x: canvas.width,
+        y: canvas.height - 90,
+        width: emojiSize,
+        height: emojiSize
+      });
+    }
+
+    function createItem() {
+      const chance = Math.random();
+      let emoji, type;
+
+      if (chance < 0.4) {
+        emoji = "🌱"; type = "good";
+      } else if (chance < 0.75) {
+        emoji = "🚲"; type = "good";
+      } else {
+        emoji = "⚡"; type = "boost";
+      }
+
+      items.push({
+        x: canvas.width,
+        y: canvas.height - 110 + Math.random() * -40,
+        width: emojiSize,
+        height: emojiSize,
+        emoji: emoji,
+        type: type
+      });
+    }
+
+    function drawGround() {
+      ctx.fillStyle = "#4caf50";
+      ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+    }
+
+    function drawSun() {
+      ctx.beginPath();
+      ctx.arc(canvas.width - 120, 100, 60, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffeb3b";
+      ctx.fill();
+    }
+
+    function drawClouds() {
+      ctx.fillStyle = "#ffffff";
+      clouds.forEach(cloud => {
+        ctx.beginPath();
+        ctx.ellipse(cloud.x, cloud.y, 70, 35, 0, 0, Math.PI * 2);
+        ctx.fill();
+        cloud.x -= cloud.speed;
+        if (cloud.x < -70) cloud.x = canvas.width + 100;
+      });
+    }
+
+    function showGameOver() {
+      finalScoreText.textContent = "Pontuação: " + score;
+      gameOverScreen.style.display = "flex";
+    }
+
+    function update() {
+      if (gameOver) {
+        showGameOver();
+        return;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawClouds();
+      drawSun();
+      drawGround();
+
+      // Power-up
+      if (powerUpTimer > 0) {
+        powerUpTimer--;
+        player.jumpBoost = 1.5;
+      } else {
+        player.jumpBoost = 1;
+      }
+
+      player.dy += player.gravity;
+      player.y += player.dy;
+
+      if (player.y + player.height >= canvas.height - 50) {
+        player.y = canvas.height - 50 - player.height;
+        player.dy = 0;
+        player.grounded = true;
+      } else {
+        player.grounded = false;
+      }
+
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+
+
+      for (let i = 0; i < obstacles.length; i++) {
+        const obs = obstacles[i];
+        obs.x -= 7;
+
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(obs.x, obs.y, obs.width, obs.height);
+
+        ctx.fillText(obs.emoji, obs.x, obs.y + emojiSize);
+        if (
+          player.x < obs.x + obs.width &&
+          player.x + player.width > obs.x &&
+          player.y < obs.y + obs.height &&
+          player.y + player.height > obs.y
+        ) {
+          gameOver = true;
+        }
+      }
+
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        item.x -= 6;
+
+        ctx.strokeStyle = item.type === "good" ? "green" : "yellow";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(item.x, item.y, item.width, item.height);
+
+        ctx.fillText(item.emoji, item.x, item.y + emojiSize);
+
+        if (
+          player.x < item.x + item.width &&
+          player.x + player.width > item.x &&
+          player.y < item.y + item.height &&
+          player.y + player.height > item.y
+        ) {
+          if (item.type === "good") score++;
+          if (item.type === "boost") powerUpTimer = 300;
+          items.splice(i, 1);
+        }
+      }
+
+      if (obstacles.length && obstacles[0].x + obstacles[0].width < 0) {
+        obstacles.shift();
+        score++;
+      }
+
+      items = items.filter(item => item.x + item.width > 0);
+
+      if (frame % 80 === 0) createObstacle();
+      if (frame % 100 === 0) createItem();
+
+      ctx.fillStyle = "#fff";
+      ctx.font = "26px Arial";
+      ctx.fillText("Pontuação: " + score, 10, 40);
+
+      if (powerUpTimer > 0) {
+        ctx.fillStyle = "#ffd600";
+        ctx.fillText("Poder ativo: Salto ↑", 10, 70);
+      }
+
+      frame++;
+      requestAnimationFrame(update);
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && player.grounded && !gameOver) {
+        player.dy = player.jumpForce * player.jumpBoost;
+      }
+    });
+
+    retryBtn.addEventListener("click", () => {
+      resetGame();
+    });
+
+    resetGame();
+  </script>
+</body>
+</html>

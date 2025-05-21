@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Geografia 9ºO cartas</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #e8f5e9;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 { color: #2e7d32; }
+    .recursos {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 20px 0;
+    }
+    .recurso {
+      background: #ffffff;
+      padding: 10px;
+      border: 2px solid #388e3c;
+      border-radius: 8px;
+      width: 120px;
+    }
+    .carta {
+      background: #c8e6c9;
+      border: 1px solid #2e7d32;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px;
+      display: inline-block;
+      cursor: pointer;
+      width: 200px;
+    }
+    .carta:hover {
+      background: #a5d6a7;
+    }
+  </style>
+</head>
+<body>
+  <h1> Cidade Sustentável</h1>
+  <body>     <p> <h1> <a href="index.html" title="Menu" > Menu </a> </h1>  </p> </body>
+  <p>Equilibra Energia, Ambiente e População durante 20 turnos</p>
+
+  <div class="recursos">
+    <div class="recurso">🔋 Energia: <span id="energia">5</span></div>
+    <div class="recurso">🍃 Ambiente: <span id="ambiente">5</span></div>
+    <div class="recurso">👨‍👩‍👧‍👦 População: <span id="populacao">5</span></div>
+  </div>
+
+  <div id="cartas"></div>
+  <p id="status"></p>
+
+  <script>
+    let estado = {
+      energia: 5,
+      ambiente: 5,
+      populacao: 5,
+      turno: 1,
+      maxTurnos: 20
+    };
+
+    const todasCartas = [
+      { nome: "Barragem Hidroelétrica", energia: +2, ambiente: -1, populacao: 0 },
+      { nome: "Reserva Natural", energia: -1, ambiente: +3, populacao: 0 },
+      { nome: "Nova Cidade", energia: -2, ambiente: -1, populacao: +2 },
+      { nome: "Transportes Públicos", energia: -1, ambiente: +2, populacao: 0 },
+      { nome: "Central a Carvão", energia: +3, ambiente: -3, populacao: 0 },
+      { nome: "Campanha de Reciclagem", energia: 0, ambiente: +1, populacao: 0 },
+      { nome: "Fábrica", energia: +2, ambiente: -2, populacao: +1 },
+      { nome: "Educação Ambiental", energia: 0, ambiente: +1, populacao: 0 },
+      { nome: "Energia Solar", energia: +1, ambiente: +2, populacao: 0 },
+      { nome: "Desflorestação", energia: +1, ambiente: -3, populacao: 0 },
+      { nome: "Tecnologia Verde", energia: +2, ambiente: +2, populacao: 0 },
+      { nome: "Crise Alimentar", energia: -2, ambiente: -1, populacao: -1 },
+      { nome: "Vacinação em Massa", energia: -1, ambiente: 0, populacao: +2 },
+      { nome: "Colheita Sustentável", energia: +1, ambiente: +1, populacao: 0 },
+      { nome: "Tempestade Tropical", energia: -2, ambiente: -3, populacao: -1 },
+      { nome: "Economia Circular", energia: +1, ambiente: +2, populacao: 0 },
+      { nome: "Fecho de Indústria Poluente", energia: -2, ambiente: +3, populacao: -1 }
+    ];
+    //estou cansado 9:32 da noite 
+    function atualizarInterface() {
+      document.getElementById("energia").textContent = estado.energia;
+      document.getElementById("ambiente").textContent = estado.ambiente;
+      document.getElementById("populacao").textContent = estado.populacao;
+
+      if (estado.turno > estado.maxTurnos) {
+        document.getElementById("status").textContent = "✅ Parabéns! Sobreviveste 20 turnos!";
+        document.getElementById("cartas").innerHTML = "";
+        return;
+      }
+
+      if (estado.energia <= 0) {
+        document.getElementById("status").textContent = "❌ Colapso energético! Perdeste.";
+        document.getElementById("cartas").innerHTML = "";
+        return;
+      }
+
+      if (estado.ambiente <= 0) {
+        document.getElementById("status").textContent = "❌ Colapso ambiental! Perdeste.";
+        document.getElementById("cartas").innerHTML = "";
+        return;
+      }
+
+      if (estado.populacao >= 12) {
+        document.getElementById("status").textContent = "❌ População insustentável! Perdeste.";
+        document.getElementById("cartas").innerHTML = "";
+        return;
+      }
+
+      document.getElementById("status").textContent = `Turno ${estado.turno} de ${estado.maxTurnos}`;
+    }
+
+    function mostrarCartas() {
+      const cartasDiv = document.getElementById("cartas");
+      cartasDiv.innerHTML = "";
+      const escolhas = todasCartas.sort(() => 0.5 - Math.random()).slice(0, 5);
+
+      escolhas.forEach(carta => {
+        const div = document.createElement("div");
+        div.className = "carta";
+        div.innerHTML = `<strong>${carta.nome}</strong><br>
+          🔋 ${carta.energia > 0 ? "+" : ""}${carta.energia},
+          🍃 ${carta.ambiente > 0 ? "+" : ""}${carta.ambiente},
+          👨‍👩‍👧‍👦 ${carta.populacao > 0 ? "+" : ""}${carta.populacao}`;
+        div.onclick = () => jogarCarta(carta);
+        cartasDiv.appendChild(div);
+      });
+    }
+
+    function jogarCarta(carta) {
+      estado.energia += carta.energia;
+      estado.ambiente += carta.ambiente;
+      estado.populacao += carta.populacao;
+      estado.populacao += 1; 
+      estado.turno++;
+      atualizarInterface();
+      mostrarCartas();
+    }
+
+    atualizarInterface();
+    mostrarCartas();
+  </script>
+</body>
+</html>

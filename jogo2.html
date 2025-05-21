@@ -4,7 +4,7 @@
 <html lang="pt-PT">
 <head>
   <meta charset="UTF-8">
-  <title>Salva o Planeta </title>
+  <title>Geografia 9ºO arcade</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -32,7 +32,7 @@
 
 <h1> Salva o Planeta!</h1>
 
-<p> <h1> <a href="index.html" title="Page 2" > Menu </a> </h1>  </p>
+<p> <h1> <a href="index.html" title="Menu" > Menu </a> </h1>  </p>
 
 <p>Move a planta com as setas e apanha itens bons! Evita os maus! </p>
 
@@ -71,7 +71,6 @@
     for (let i = items.length - 1; i >= 0; i--) {
       items[i].y += 3;
 
-      // colisão
       if (
         items[i].y > player.y - 30 &&
         items[i].x > player.x - 10 &&
@@ -115,6 +114,8 @@
     });
   }
 
+ // ja deu erro 4x vou dormir 
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowLeft" && player.x > 0) player.x -= player.speed;
     if (e.key === "ArrowRight" && player.x < canvas.width - player.size) player.x += player.speed;
@@ -123,6 +124,8 @@
   setInterval(spawnItem, 800);
   gameLoop();
 </script>
+
+
 
 </body>
 </html>

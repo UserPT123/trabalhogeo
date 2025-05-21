@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Geografia 9ºO</title>
+  <body>     <p> <h1> <a href="index.html" title="Menu" > Menu </a> </h1>  </p> </body>
+  <style>
+    body {body {
+  font-family: sans-serif;
+  background-color: #e0f7fa;
+  padding: 20px;
+}
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(8, 60px);
+      grid-template-rows: repeat(8, 60px);
+      border: 2px solid #333;
+    }
+
+    .cell {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      font-size: 30px;
+      cursor: pointer;
+    }
+
+.container {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+    .light {
+      background-color: #c8e6c9;
+    }
+
+    .dark {
+      background-color: #81c784;
+    }
+
+    .selected {
+      border: 2px solid red;
+    }
+
+    .suggestion {
+      border: 2px dashed blue;
+    }
+
+    .legend {
+      font-size: 18px;
+      background: #ffffffaa;
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 250px;
+    }
+
+    .legend h2 {
+      margin-top: 0;
+    }
+
+    .legend ul {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="board" id="board"></div>
+
+    <div class="legend">
+      <h2>Legenda</h2>
+      <strong>Equipa Verde 🌱</strong>
+      <ul>
+        <li>🌍 Rei</li>
+        <li>🌞 Rainha</li>
+        <li>🌲 Torre</li>
+        <li>🐳 Bispo</li>
+        <li>🚴 Cavalo</li>
+        <li>♻️ Peão</li>
+      </ul>
+      <strong>Equipa Cinzenta 🏭</strong>
+      <ul>
+        <li>🏭 Rei</li>
+        <li>🔥 Rainha</li>
+        <li>🌋 Torre</li>
+        <li>☠️ Bispo</li>
+        <li>🚛 Cavalo</li>
+        <li>🛢️ Peão</li>
+      </ul>
+    </div>
+  </div>
+
+
+
+  <script>
+    const board = document.getElementById("board");
+
+    const pieces = {
+      green: {
+        king: "🌍",
+        queen: "🌞",
+        rook: "🌲",
+        bishop: "🐳",
+        knight: "🚴",
+        pawn: "♻️"
+      },
+      gray: {
+        king: "🏭",
+        queen: "🔥",
+        rook: "🌋",
+        bishop: "☠️",
+        knight: "🚛",
+        pawn: "🛢️"
+      }
+    };
+
+    let boardState = Array(8).fill().map(() => Array(8).fill(""));
+    let selected = null;
+    let currentPlayer = "green";
+    let moveSuggestions = [];
+
+    function setupBoard() {
+      boardState[0] = [pieces.gray.rook, pieces.gray.knight, pieces.gray.bishop, pieces.gray.queen, pieces.gray.king, pieces.gray.bishop, pieces.gray.knight, pieces.gray.rook];
+      boardState[1] = Array(8).fill(pieces.gray.pawn);
+      boardState[6] = Array(8).fill(pieces.green.pawn);
+      boardState[7] = [pieces.green.rook, pieces.green.knight, pieces.green.bishop, pieces.green.queen, pieces.green.king, pieces.green.bishop, pieces.green.knight, pieces.green.rook];
+    }
+
+    function getTeam(piece) {
+      for (let team in pieces) {
+        for (let type in pieces[team]) {
+          if (pieces[team][type] === piece) return team;
+        }
+      }
+      return null;
+    }
+
+    function renderBoard() {
+      board.innerHTML = "";
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          const cell = document.createElement("div");
+          cell.className = "cell " + ((row + col) % 2 === 0 ? "light" : "dark");
+          cell.dataset.row = row;
+          cell.dataset.col = col;
+          cell.textContent = boardState[row][col];
+
+          if (selected && row === selected[0] && col === selected[1]) {
+            cell.classList.add("selected");
+          }
+
+          if (moveSuggestions.some(pos => pos[0] === row && pos[1] === col)) {
+            cell.classList.add("suggestion");
+          }
+
+          cell.addEventListener("click", () => handleCellClick(row, col));
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    function handleCellClick(row, col) {
+      const piece = boardState[row][col];
+      const team = getTeam(piece);
+
+      if (selected) {
+        const [sRow, sCol] = selected;
+        if (moveSuggestions.some(pos => pos[0] === row && pos[1] === col)) {
+          boardState[row][col] = boardState[sRow][sCol];
+          boardState[sRow][sCol] = "";
+          selected = null;
+          moveSuggestions = [];
+          currentPlayer = currentPlayer === "green" ? "gray" : "green";
+          renderBoard();
+          return;
+        }
+        selected = null;
+        moveSuggestions = [];
+        renderBoard();
+      } else if (piece && team === currentPlayer) {
+        selected = [row, col];
+        moveSuggestions = getLegalMoves(row, col);
+        renderBoard();
+      }
+    }
+
+    function getLegalMoves(row, col) {
+      const piece = boardState[row][col];
+      const team = getTeam(piece);
+      const opponent = team === "green" ? "gray" : "green";
+      const moves = [];
+
+      const addMove = (r, c) => {
+        if (r >= 0 && r < 8 && c >= 0 && c < 8) {
+          const target = boardState[r][c];
+          if (!target || getTeam(target) !== team) moves.push([r, c]);
+        }
+      };
+
+      const directions = {
+        rook: [[1, 0], [-1, 0], [0, 1], [0, -1]],
+        bishop: [[1, 1], [-1, -1], [-1, 1], [1, -1]],
+        queen: [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [-1, 1], [1, -1]],
+        knight: [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]],
+        king: [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [-1, 1], [1, -1]]
+      };
+
+      for (let type in pieces[team]) {
+        if (pieces[team][type] === piece) {
+          if (type === "pawn") {
+            const dir = team === "green" ? -1 : 1;
+            const startRow = team === "green" ? 6 : 1;
+
+            if (boardState[row + dir] && boardState[row + dir][col] === "") {
+              moves.push([row + dir, col]);
+
+              if (row === startRow && boardState[row + 2 * dir][col] === "") {
+                moves.push([row + 2 * dir, col]);
+              }
+            }
+
+           // alguem realmente le as notas resposta nao sei mas tou cansado mds (sim sei q ja disse isso 10x)
+
+            [-1, 1].forEach(dc => {
+              const r = row + dir;
+              const c = col + dc;
+              if (r >= 0 && r < 8 && c >= 0 && c < 8) {
+                const target = boardState[r][c];
+                if (target && getTeam(target) === opponent) {
+                  moves.push([r, c]);
+                }
+              }
+            });
+
+          } else if (type === "knight") {
+            directions.knight.forEach(([dr, dc]) => addMove(row + dr, col + dc));
+          } else if (type === "king") {
+            directions.king.forEach(([dr, dc]) => addMove(row + dr, col + dc));
+          } else if (type === "rook" || type === "bishop" || type === "queen") {
+            const dirList = directions[type];
+            dirList.forEach(([dr, dc]) => {
+              for (let i = 1; i < 8; i++) {
+                const r = row + dr * i;
+                const c = col + dc * i;
+                if (r < 0 || r > 7 || c < 0 || c > 7) break;
+                const target = boardState[r][c];
+                if (!target) {
+                  moves.push([r, c]);
+                } else {
+                  if (getTeam(target) === opponent) moves.push([r, c]);
+                  break;
+                }
+              }
+            });
+          }
+        }
+      }
+
+      return moves;
+    }
+
+    setupBoard();
+    renderBoard();
+  </script>
+</body>
+</html>
